@@ -100,7 +100,12 @@ class _loginpagesState extends State<loginpages> {
     );
   }
 
-  void login() {}
+  void login() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => registers()),
+    );
+  }
 
   void register() {
     Navigator.push(
