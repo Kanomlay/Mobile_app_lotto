@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/pages/register.dart';
 import 'package:http/http.dart' as http;
 
@@ -103,7 +104,7 @@ class _loginpagesState extends State<loginpages> {
   void login() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => registers()),
+      MaterialPageRoute(builder: (context) => const HomePage()),
     );
   }
 
