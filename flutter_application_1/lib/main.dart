@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/admin.dart';
 import 'package:flutter_application_1/pages/login.dart';
 
 void main() {
@@ -11,13 +12,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Lotto CS',
       theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.orange,
+        fontFamily: 'Kanit', // ใช้ฟอนต์ไทยสวย ๆ ถ้ามีเพิ่ม
       ),
-      home: loginpages(),
+      home: const AdminPage(),
     );
   }
 }
-
