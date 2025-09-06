@@ -117,13 +117,48 @@ class loginpages extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       onPressed: () {
-                        // ใช้ pushReplacement เพื่อไปหน้า HomePage
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomePage(),
-                          ),
-                        );
+                        String phone = phoneController.text.trim();
+                        String pin = pinController.text.trim();
+
+                        UserType result = login(phone, pin);
+
+                        switch (result) {
+                          case UserType.user:
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomePage(),
+                              ),
+                            );
+                            break;
+
+                          case UserType.admin:
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AdminPage(),
+                              ),
+                            );
+                            break;
+
+                          case UserType.invalid:
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text("Login Failed"),
+                                content: const Text(
+                                  "เบอร์/อีเมล หรือ PIN ไม่ถูกต้อง",
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("OK"),
+                                  ),
+                                ],
+                              ),
+                            );
+                            break;
+                        }
                       },
                       child: const Text(
                         "SIGN IN",
@@ -166,4 +201,30 @@ class loginpages extends StatelessWidget {
       ),
     );
   }
+}
+
+enum UserType { admin, user, invalid }
+
+UserType login(String phoneOrEmail, String pin) {
+  // ผู้ใช้ทั่วไป
+  const userPhone = "1234";
+  const userEmail = "user@example.com";
+  const userPin = "1234";
+
+  // แอดมิน
+  const adminPhone = "9999";
+  const adminEmail = "admin@example.com";
+  const adminPin = "9999";
+
+  if ((phoneOrEmail == userPhone || phoneOrEmail == userEmail) &&
+      pin == userPin) {
+    return UserType.user;
+  }
+
+  if ((phoneOrEmail == adminPhone || phoneOrEmail == adminEmail) &&
+      pin == adminPin) {
+    return UserType.admin;
+  }
+
+  return UserType.invalid; // login ไม่ถูกต้อง
 }
