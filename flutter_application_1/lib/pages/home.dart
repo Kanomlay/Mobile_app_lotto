@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/login.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,7 +22,12 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+               Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const loginpages()),
+                    );
+            },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
         ],

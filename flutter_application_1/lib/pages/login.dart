@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/pages/register.dart';
 
 class loginpages extends StatelessWidget {
@@ -116,7 +117,13 @@ class loginpages extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       onPressed: () {
-                        // TODO: เขียน logic login
+                        // ใช้ pushReplacement เพื่อไปหน้า HomePage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ),
+                        );
                       },
                       child: const Text(
                         "SIGN IN",
@@ -141,9 +148,7 @@ class loginpages extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const register(),
-                      ),
+                      MaterialPageRoute(builder: (context) => const register()),
                     );
                   },
                   child: const Text(
@@ -155,7 +160,7 @@ class loginpages extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
