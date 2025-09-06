@@ -14,11 +14,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Lotto CS',
-      theme: ThemeData(
-        primarySwatch: Colors.orange,
-        fontFamily: 'Kanit', // ใช้ฟอนต์ไทยสวย ๆ ถ้ามีเพิ่ม
-      ),
-      home: const AdminPage(),
+      theme: ThemeData(primarySwatch: Colors.orange),
+      home: const AdminPage(), // เริ่มที่หน้า Admin
     );
   }
 }
