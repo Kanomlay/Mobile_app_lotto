@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/admin.dart';
 import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/pages/register.dart';
 
@@ -203,15 +204,16 @@ class loginpages extends StatelessWidget {
   }
 }
 
+
 enum UserType { admin, user, invalid }
 
 UserType login(String phoneOrEmail, String pin) {
-  // ผู้ใช้ทั่วไป
+
   const userPhone = "1234";
   const userEmail = "user@example.com";
   const userPin = "1234";
 
-  // แอดมิน
+
   const adminPhone = "9999";
   const adminEmail = "admin@example.com";
   const adminPin = "9999";
