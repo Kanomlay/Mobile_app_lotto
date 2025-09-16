@@ -14,9 +14,7 @@ class DrawResultPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {
-            
-          },
+          onPressed: () {},
         ),
         title: const Text(
           "Lotto CS",
@@ -31,9 +29,9 @@ class DrawResultPage extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const loginpages()),
-                    );
+                context,
+                MaterialPageRoute(builder: (context) => const loginpages()),
+              );
             },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
