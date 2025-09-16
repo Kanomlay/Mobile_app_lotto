@@ -1,23 +1,110 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/admin.dart';
 import 'package:flutter_application_1/pages/home.dart';
+import 'package.dart';
 import 'package:flutter_application_1/pages/register.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/config.dart';
+import 'package:flutter_application_1/model/login_req.dart';
+import 'package:flutter_application_1/model/login_res.dart';
 
-class loginpages extends StatelessWidget {
+class loginpages extends StatefulWidget {
   const loginpages({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final phoneController = TextEditingController();
-    final pinController = TextEditingController();
+  State<loginpages> createState() => _LoginpagesState();
+}
 
+class _LoginpagesState extends State<loginpages> {
+  //--- ส่วนของ State และ Logic ---
+  final emailController = TextEditingController();
+  final pinController = TextEditingController();
+  String url = '';
+
+  @override
+  void initState() {
+    super.initState();
+    Configuration.getConfig().then((config) {
+      setState(() {
+        url = config['apiEndpoint'];
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    pinController.dispose();
+    super.dispose();
+  }
+
+  Future<void> login() async {
+    if (url.isEmpty) {
+      print("API endpoint URL is not loaded yet.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot connect to server. Please try again later.')),
+      );
+      return;
+    }
+
+    final req = LoginReq(
+      email: emailController.text,
+      passwordHash: pinController.text,
+    );
+
+    try {
+      final response = await http.post(
+        Uri.parse('$url/users/login'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(req.toJson()),
+      );
+
+      // ใช้ mounted check เพื่อความปลอดภัย
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final res = loginResFromJson(response.body);
+        final userRole = res.user.role;
+
+        if (userRole == 'admin') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminPage()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }
+      } else {
+        final errorBody = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: ${errorBody['error'] ?? 'Unknown error'}')),
+        );
+      }
+    } catch (e) {
+      print("An error occurred: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot connect to the server. Please check your connection.')),
+      );
+    }
+  }
+
+  //--- ส่วนของการสร้าง UI ---
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
+          onPressed: () {
+            // ควรใส่ Navigator.pop(context); เพื่อให้ปุ่ม back ทำงาน
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           "SIGN IN",
@@ -27,7 +114,14 @@ class loginpages extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.home, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+               // ควรใส่ Navigator.pushAndRemoveUntil เพื่อกลับไปหน้าแรกสุด
+               Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (Route<dynamic> route) => false,
+                );
+            },
           ),
         ],
       ),
@@ -35,7 +129,6 @@ class loginpages extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 30),
-            // โลโก้ชื่อแอป
             const Text(
               "Lotto\nCS",
               textAlign: TextAlign.center,
@@ -54,8 +147,6 @@ class loginpages extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-
-            // กล่องฟอร์ม
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(20),
@@ -73,20 +164,16 @@ class loginpages extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("มีบัญชีผู้แล้วใช่ไหม?"),
+                  const Text("มีบัญชีผู้ใช้แล้วใช่ไหม?"),
                   const SizedBox(height: 10),
-
-                  // ช่องกรอก Phone/Email
                   TextField(
-                    controller: phoneController,
+                    controller: emailController, // แก้ไขชื่อให้ตรงกัน
                     decoration: const InputDecoration(
-                      hintText: "Input your phone or email",
+                      hintText: "Input your email",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 15),
-
-                  // ช่องกรอก PIN
                   TextField(
                     controller: pinController,
                     obscureText: true,
@@ -95,7 +182,6 @@ class loginpages extends StatelessWidget {
                       border: OutlineInputBorder(),
                     ),
                   ),
-
                   const SizedBox(height: 10),
                   Align(
                     alignment: Alignment.centerRight,
@@ -108,8 +194,6 @@ class loginpages extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // ปุ่ม Sign In
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -117,50 +201,7 @@ class loginpages extends StatelessWidget {
                         backgroundColor: Colors.orange,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
-                      onPressed: () {
-                        String phone = phoneController.text.trim();
-                        String pin = pinController.text.trim();
-
-                        UserType result = login(phone, pin);
-
-                        switch (result) {
-                          case UserType.user:
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomePage(),
-                              ),
-                            );
-                            break;
-
-                          case UserType.admin:
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AdminPage(),
-                              ),
-                            );
-                            break;
-
-                          case UserType.invalid:
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text("Login Failed"),
-                                content: const Text(
-                                  "เบอร์/อีเมล หรือ PIN ไม่ถูกต้อง",
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text("OK"),
-                                  ),
-                                ],
-                              ),
-                            );
-                            break;
-                        }
-                      },
+                      onPressed: login,
                       child: const Text(
                         "SIGN IN",
                         style: TextStyle(
@@ -174,8 +215,6 @@ class loginpages extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // สมัครสมาชิก
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -202,31 +241,4 @@ class loginpages extends StatelessWidget {
       ),
     );
   }
-}
-
-
-enum UserType { admin, user, invalid }
-
-UserType login(String phoneOrEmail, String pin) {
-
-  const userPhone = "1234";
-  const userEmail = "user@example.com";
-  const userPin = "1234";
-
-
-  const adminPhone = "9999";
-  const adminEmail = "admin@example.com";
-  const adminPin = "9999";
-
-  if ((phoneOrEmail == userPhone || phoneOrEmail == userEmail) &&
-      pin == userPin) {
-    return UserType.user;
-  }
-
-  if ((phoneOrEmail == adminPhone || phoneOrEmail == adminEmail) &&
-      pin == adminPin) {
-    return UserType.admin;
-  }
-
-  return UserType.invalid; // login ไม่ถูกต้อง
 }
