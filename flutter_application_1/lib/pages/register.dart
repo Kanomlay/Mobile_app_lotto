@@ -209,4 +209,7 @@ class register extends StatelessWidget {
       ),
     );
   }
+  void Register() {
+    
+  }
 }
