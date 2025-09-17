@@ -204,15 +204,12 @@ class loginpages extends StatelessWidget {
   }
 }
 
-
 enum UserType { admin, user, invalid }
 
 UserType login(String phoneOrEmail, String pin) {
-
   const userPhone = "1234";
   const userEmail = "user@example.com";
   const userPin = "1234";
-
 
   const adminPhone = "9999";
   const adminEmail = "admin@example.com";
