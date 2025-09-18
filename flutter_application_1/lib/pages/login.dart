@@ -211,7 +211,10 @@ class _LoginpagesState extends State<loginpages> {
                         backgroundColor: Colors.orange,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
-                      onPressed: login,
+                      onPressed: () {
+                        print("Login button pressed");
+                        login();
+                      },
                       child: const Text(
                         "SIGN IN",
                         style: TextStyle(
@@ -258,14 +261,14 @@ class _LoginpagesState extends State<loginpages> {
 
 // UserType login(String phoneOrEmail, String pin) {
 
-//   const userPhone = "1234";
-//   const userEmail = "user@example.com";
-//   const userPin = "1234";
+// //   const userPhone = "1234";
+// //   const userEmail = "user@example.com";
+// //   const userPin = "1234";
 
 
-//   const adminPhone = "9999";
-//   const adminEmail = "admin@example.com";
-//   const adminPin = "9999";
+// //   const adminPhone = "9999";
+// //   const adminEmail = "admin@example.com";
+// //   const adminPin = "9999";
 
 //   if ((phoneOrEmail == userPhone || phoneOrEmail == userEmail) &&
 //       pin == userPin) {
