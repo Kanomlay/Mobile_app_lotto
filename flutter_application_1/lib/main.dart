@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/admin.dart';
 import 'package:flutter_application_1/pages/login.dart';
+import 'package:flutter_application_1/pages/wallet_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Lotto CS',
       theme: ThemeData(primarySwatch: Colors.orange),
-      home: const AdminPage(), // เริ่มที่หน้า Admin
+      home: const WalletPage(), // เริ่มที่หน้า Admin
     );
   }
 }
