@@ -9,6 +9,9 @@ class register extends StatelessWidget {
     final lastNameController = TextEditingController();
     final phoneController = TextEditingController();
     final emailController = TextEditingController();
+    final passController = TextEditingController();
+    final conpassController = TextEditingController();
+    final moneyController = TextEditingController();
     bool agreeTerms = false;
 
     return Scaffold(
@@ -135,6 +138,35 @@ class register extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
 
+                  // Email
+                  TextField(
+                    controller: moneyController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "Money",
+                      hintText: "กลอกเงินเริ่มต้น",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    controller: passController,
+                    decoration: const InputDecoration(
+                      labelText: "Password",
+                      hintText: "กรอกรหัสผ่าน",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    controller: conpassController,
+                    decoration: const InputDecoration(
+                      labelText: "ConfirmPassword",
+                      hintText: "กรอกรหัสผ่านยืนยัน",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
                   // Checkbox ยอมรับเงื่อนไข
                   Row(
                     children: [
