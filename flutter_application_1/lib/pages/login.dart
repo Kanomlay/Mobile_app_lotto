@@ -1,13 +1,14 @@
-import 'dart:convert';
+//import 'dart:nativewrappers/_internal/vm/lib/developer.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/admin.dart';
-import 'package:flutter_application_1/pages/home.dart';
-import 'package.dart';
-import 'package:flutter_application_1/pages/register.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/model/login_req.dart';
 import 'package:flutter_application_1/model/login_res.dart';
+import 'package:flutter_application_1/pages/admin.dart';
+import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/register.dart';
+import 'package:flutter_application_1/config.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class loginpages extends StatefulWidget {
   const loginpages({super.key});
@@ -17,82 +18,19 @@ class loginpages extends StatefulWidget {
 }
 
 class _LoginpagesState extends State<loginpages> {
-  //--- ส่วนของ State และ Logic ---
-  final emailController = TextEditingController();
-  final pinController = TextEditingController();
+  var email = TextEditingController();
+  var passwordHash = TextEditingController();
   String url = '';
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     Configuration.getConfig().then((config) {
-      setState(() {
-        url = config['apiEndpoint'];
-      });
+      url = config['apiEndpoint'];
     });
   }
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    pinController.dispose();
-    super.dispose();
-  }
-
-  Future<void> login() async {
-    if (url.isEmpty) {
-      print("API endpoint URL is not loaded yet.");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cannot connect to server. Please try again later.')),
-      );
-      return;
-    }
-
-    final req = LoginReq(
-      email: emailController.text,
-      passwordHash: pinController.text,
-    );
-
-    try {
-      final response = await http.post(
-        Uri.parse('$url/users/login'),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(req.toJson()),
-      );
-
-      // ใช้ mounted check เพื่อความปลอดภัย
-      if (!mounted) return;
-
-      if (response.statusCode == 200) {
-        final res = loginResFromJson(response.body);
-        final userRole = res.user.role;
-
-        if (userRole == 'admin') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminPage()),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
-        }
-      } else {
-        final errorBody = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${errorBody['error'] ?? 'Unknown error'}')),
-        );
-      }
-    } catch (e) {
-      print("An error occurred: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cannot connect to the server. Please check your connection.')),
-      );
-    }
-  }
-
-  //--- ส่วนของการสร้าง UI ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +40,7 @@ class _LoginpagesState extends State<loginpages> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            // ควรใส่ Navigator.pop(context); เพื่อให้ปุ่ม back ทำงาน
+            // Allows the back button to function correctly
             Navigator.pop(context);
           },
         ),
@@ -115,12 +53,12 @@ class _LoginpagesState extends State<loginpages> {
           IconButton(
             icon: const Icon(Icons.home, color: Colors.black),
             onPressed: () {
-               // ควรใส่ Navigator.pushAndRemoveUntil เพื่อกลับไปหน้าแรกสุด
-               Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                  (Route<dynamic> route) => false,
-                );
+              // Navigates to the root home page and clears the navigation stack
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (Route<dynamic> route) => false,
+              );
             },
           ),
         ],
@@ -167,17 +105,17 @@ class _LoginpagesState extends State<loginpages> {
                   const Text("มีบัญชีผู้ใช้แล้วใช่ไหม?"),
                   const SizedBox(height: 10),
                   TextField(
-                    controller: emailController, // แก้ไขชื่อให้ตรงกัน
-                    decoration: const InputDecoration(
+                    controller: email,
+                    decoration: InputDecoration(
                       hintText: "Input your email",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 15),
                   TextField(
-                    controller: pinController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
+                    controller: passwordHash,
+                    //obscureText: true,
+                    decoration: InputDecoration(
                       hintText: "Input PIN",
                       border: OutlineInputBorder(),
                     ),
@@ -201,7 +139,9 @@ class _LoginpagesState extends State<loginpages> {
                         backgroundColor: Colors.orange,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
-                      onPressed: login,
+                      onPressed: () {
+                        login();
+                      },
                       child: const Text(
                         "SIGN IN",
                         style: TextStyle(
@@ -241,4 +181,47 @@ class _LoginpagesState extends State<loginpages> {
       ),
     );
   }
+
+void login() {
+  LoginReq req = LoginReq(email: email.text, password: passwordHash.text);
+
+  http
+      .post(
+        Uri.parse('$url/users/login'),
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: jsonEncode(req.toJson()),
+      )
+      .then((value) {
+        log('>>> email: ${req.email}');
+        log('>>> password: ${req.password}');
+        log(value.body);
+
+        final data = jsonDecode(value.body);
+        if (data['error'] != null) {
+          log('Login error: ${data['error']}');
+          // แสดง Snackbar หรือ Alert ได้ตามต้องการ
+          return;
+        }
+
+        LoginRes loginRes = LoginRes.fromJson(data);
+        log(loginRes.message);
+
+        // ตรวจ role
+        if (loginRes.user.role.toLowerCase() == 'admin') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminPage()),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        }
+      })
+      .catchError((error) {
+        log(error.toString());
+      });
+}
+
 }
