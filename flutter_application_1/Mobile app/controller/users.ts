@@ -20,38 +20,41 @@ router.get("/", async (req, res) => {
   }
 });
 // 1. createUser(userData): สร้างผู้ใช้ใหม่ (สมัครสมาชิก)
+// ในไฟล์ routes/userRouter.ts
+
 router.post("/register", (req, res) => {
+  // 1. รับค่าจาก body ให้ครบทุก field ตามหน้า UI
   const newUser: {
     first_name?: string;
     last_name?: string;
+    phone_number?: string;
     email: string;
+    wallet_balance?: number;
     password_hash: string;
   } = req.body;
 
-  // !!! คำเตือน: ในระบบจริง ห้ามเก็บรหัสผ่านเป็นข้อความธรรมดาเด็ดขาด !!!
-  // !!! ควรใช้ library อย่าง bcrypt ในการ hash รหัสผ่านก่อนบันทึก !!!
-  let sql =
-    "INSERT INTO `users`(`first_name`, `last_name`, `email`, `password_hash`) VALUES (?,?,?,?)";
+  // 2. แก้ไข SQL INSERT ให้รองรับคอลัมน์ใหม่
+  let sql = "INSERT INTO `users`(`first_name`, `last_name`, `phone_number`, `email`, `wallet_balance`, `password_hash`) VALUES (?,?,?,?,?,?)";
 
+  // 3. เพิ่มข้อมูลใหม่เข้าไปใน array ของ mysql.format
   sql = mysql.format(sql, [
     newUser.first_name,
     newUser.last_name,
+    newUser.phone_number,
     newUser.email,
+    newUser.wallet_balance || 0, // ใส่ค่าเริ่มต้น 0 หากไม่ได้ส่งมา
     newUser.password_hash,
   ]);
 
   conn.query(sql, (err, result) => {
     if (err) {
-      // ER_DUP_ENTRY คือ error code ของ MySQL เมื่อมีข้อมูลซ้ำในคอลัมน์ที่เป็น UNIQUE
       if (err.code === "ER_DUP_ENTRY") {
         return res.status(409).json({ error: "This email is already in use." });
       }
       return res.status(500).json({ error: err.message });
     }
     const header = result as ResultSetHeader;
-    res
-      .status(201)
-      .json({ message: "User created successfully", user_id: header.insertId });
+    res.status(201).json({ message: "User created successfully", user_id: header.insertId });
   });
 });
 
