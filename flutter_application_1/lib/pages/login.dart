@@ -138,7 +138,7 @@ class loginpages extends StatelessWidget {
                               builder: (context) => AlertDialog(
                                 title: const Text("Login Failed"),
                                 content: const Text(
-                                  "เบอร์/อีเมล หรือ PIN ไม่ถูกต้อง",
+                                  "เบอร์/อีเมล หรือ password ไม่ถูกต้อง",
                                 ),
                                 actions: [
                                   TextButton(
