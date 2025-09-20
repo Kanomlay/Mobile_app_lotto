@@ -1,13 +1,14 @@
-import 'dart:convert';
+//import 'dart:nativewrappers/_internal/vm/lib/developer.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/admin.dart';
-import 'package:flutter_application_1/pages/home.dart';
-import 'package.dart';
-import 'package:flutter_application_1/pages/register.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/model/login_req.dart';
 import 'package:flutter_application_1/model/login_res.dart';
+import 'package:flutter_application_1/pages/admin.dart';
+import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/register.dart';
+import 'package:flutter_application_1/config.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class loginpages extends StatefulWidget {
   const loginpages({super.key});
@@ -17,13 +18,13 @@ class loginpages extends StatefulWidget {
 }
 
 class _LoginpagesState extends State<loginpages> {
-  //--- ส่วนของ State และ Logic ---
-  final emailController = TextEditingController();
-  final pinController = TextEditingController();
+  var email = TextEditingController();
+  var passwordHash = TextEditingController();
   String url = '';
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     Configuration.getConfig().then((config) {
       setState(() {
@@ -112,7 +113,7 @@ class _LoginpagesState extends State<loginpages> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            // ควรใส่ Navigator.pop(context); เพื่อให้ปุ่ม back ทำงาน
+            // Allows the back button to function correctly
             Navigator.pop(context);
           },
         ),
@@ -177,17 +178,17 @@ class _LoginpagesState extends State<loginpages> {
                   const Text("มีบัญชีผู้ใช้แล้วใช่ไหม?"),
                   const SizedBox(height: 10),
                   TextField(
-                    controller: emailController, // แก้ไขชื่อให้ตรงกัน
-                    decoration: const InputDecoration(
+                    controller: email,
+                    decoration: InputDecoration(
                       hintText: "Input your email",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 15),
                   TextField(
-                    controller: pinController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
+                    controller: passwordHash,
+                    //obscureText: true,
+                    decoration: InputDecoration(
                       hintText: "Input PIN",
                       border: OutlineInputBorder(),
                     ),
@@ -211,10 +212,7 @@ class _LoginpagesState extends State<loginpages> {
                         backgroundColor: Colors.orange,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
-                      onPressed: () {
-                        print("Login button pressed");
-                        login();
-                      },
+                      onPressed: login,
                       child: const Text(
                         "SIGN IN",
                         style: TextStyle(
@@ -255,30 +253,3 @@ class _LoginpagesState extends State<loginpages> {
     );
   }
 }
-
-
-// enum UserType { admin, user, invalid }
-
-// UserType login(String phoneOrEmail, String pin) {
-
-// //   const userPhone = "1234";
-// //   const userEmail = "user@example.com";
-// //   const userPin = "1234";
-
-
-// //   const adminPhone = "9999";
-// //   const adminEmail = "admin@example.com";
-// //   const adminPin = "9999";
-
-//   if ((phoneOrEmail == userPhone || phoneOrEmail == userEmail) &&
-//       pin == userPin) {
-//     return UserType.user;
-//   }
-
-//   if ((phoneOrEmail == adminPhone || phoneOrEmail == adminEmail) &&
-//       pin == adminPin) {
-//     return UserType.admin;
-//   }
-
-//   return UserType.invalid; // login ไม่ถูกต้อง
-// }
