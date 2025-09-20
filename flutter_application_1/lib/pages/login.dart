@@ -81,7 +81,7 @@ class loginpages extends StatelessWidget {
                     controller: pinController,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      hintText: "Input PIN",
+                      hintText: "Input password",
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -92,7 +92,7 @@ class loginpages extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {},
                       child: const Text(
-                        "ลืมรหัส PIN การเข้าสู่ระบบ?",
+                        "ลืมรหัส password การเข้าสู่ระบบ?",
                         style: TextStyle(color: Colors.orange),
                       ),
                     ),
@@ -218,5 +218,5 @@ UserType login(String phoneOrEmail, String pin) {
     return UserType.admin;
   }
 
-  return UserType.invalid; // login ไม่ถูกต้อง
+  return UserType.invalid; 
 }
