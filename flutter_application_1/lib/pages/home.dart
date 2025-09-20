@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/Check_lottery.dart';
+import 'package:flutter_application_1/pages/Lotto_buy.dart';
 import 'package:flutter_application_1/pages/login.dart';
+import 'package:flutter_application_1/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,6 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,10 +27,10 @@ class _HomePageState extends State<HomePage> {
         actions: [
           TextButton(
             onPressed: () {
-               Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const loginpages()),
-                    );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const loginpages()),
+              );
             },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
@@ -162,20 +166,63 @@ class _HomePageState extends State<HomePage> {
       // Bottom Navigation
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
         selectedItemColor: Colors.orange,
+        unselectedItemColor: const Color.fromARGB(255, 99, 99, 99),
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index; // อัปเดตปุ่มที่เลือก
+          });
+
+          // เปลี่ยนหน้า
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const HomePage()),
+              );
+              break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LottoBuyPage()),
+              );
+              break;
+            case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const CheckPage()),
+              );
+              break;
+            case 3:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HomePage(),
+                ), //<<WalletPage
+              );
+              break;
+            case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilePage()),
+              );
+              break;
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "หน้าแรก"),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: "ค้นหาสถิติ",
+            icon: Icon(Icons.shopping_cart),
+            label: "คำสั่งซื้อ",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.check_circle),
             label: "ตรวจสอบ",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.announcement),
-            label: "การประกาศผล",
+            icon: Icon(Icons.account_balance_wallet),
+            label: "กระเป๋าสตางค์ และสลาก",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "โปรไฟล์"),
         ],
