@@ -7,14 +7,34 @@ import { ResultSetHeader } from "mysql2";
 export const router = express.Router();
 
 // GET: ดึงข้อมูลลอตเตอรี่ทั้งหมด
+// router.get("/", (req, res) => {
+//     const sql = "SELECT * FROM lottos";
+//     conn.query(sql, (err, result) => {
+//         if (err) {
+//             return res.status(500).json({ error: err.message });
+//         }
+//         res.json(result);
+//     });
+// });
 router.get("/", (req, res) => {
-    const sql = "SELECT * FROM lottos";
+    const sql = "SELECT * FROM lottos WHERE status = 'AVAILABLE'";
     conn.query(sql, (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
         res.json(result);
     });
+});
+
+router.get("/:name", (req, res) => {
+  const name = req.params.name;
+  const sql = "SELECT * FROM lottos WHERE lotto_name = ?";
+  conn.query(sql, [name], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(result); 
+  });
 });
 
 // GET: ดึงข้อมูลลอตเตอรี่ตาม ID
@@ -86,5 +106,23 @@ router.delete("/:id", (req, res) => {
             return res.status(404).json({ message: "Lotto not found" });
         }
         res.status(200).json({ affected_row: (result as ResultSetHeader).affectedRows });
+    });
+});
+router.delete("/", (req, res) => {
+    // คำสั่ง SQL สำหรับลบข้อมูลทั้งหมดจากตาราง lottos
+    const sql = "DELETE FROM `lottos`";
+
+    // ไม่ต้องส่ง parameter ตัวที่สอง ([id]) เพราะเราจะลบทั้งหมด
+    conn.query(sql, (err, result) => {
+        if (err) {
+            // หากมีข้อผิดพลาดจากฐานข้อมูล
+            return res.status(500).json({ error: err.message });
+        }
+        
+        // ส่งผลลัพธ์กลับไปว่าลบไปกี่แถว
+        res.status(200).json({ 
+            message: "All data from lottos table has been deleted successfully.",
+            affected_rows: (result as ResultSetHeader).affectedRows 
+        });
     });
 });

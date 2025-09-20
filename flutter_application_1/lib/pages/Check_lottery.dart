@@ -101,7 +101,7 @@ class _CheckPageState extends State<CheckPage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage()),
+                MaterialPageRoute(builder: (_) => const HomePage(id: 0)),
               );
               break;
             case 1:
@@ -119,15 +119,14 @@ class _CheckPageState extends State<CheckPage> {
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const HomePage(),
+                MaterialPageRoute(builder: (_) => const HomePage(id: 0,)
                 ), //<<WalletPage
               );
               break;
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const ProfilePage()),
+                MaterialPageRoute(builder: (_) =>  ProfilePage(id: 0)),
               );
               break;
           }

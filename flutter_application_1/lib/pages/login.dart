@@ -54,11 +54,6 @@ class _LoginpagesState extends State<loginpages> {
             icon: const Icon(Icons.home, color: Colors.black),
             onPressed: () {
               // Navigates to the root home page and clears the navigation stack
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (Route<dynamic> route) => false,
-              );
             },
           ),
         ],
@@ -215,7 +210,7 @@ void login() {
         } else {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => HomePage(id: loginRes.user.userId)),
           );
         }
       })

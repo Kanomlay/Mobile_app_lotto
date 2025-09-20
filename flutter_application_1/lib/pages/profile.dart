@@ -4,7 +4,8 @@ import 'package:flutter_application_1/pages/Lotto_buy.dart';
 import 'package:flutter_application_1/pages/home.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  int id = 0;
+  ProfilePage({super.key,required this.id});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -186,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage()),
+                MaterialPageRoute(builder: (_) => const HomePage(id: 0)),
               );
               break;
             case 1:
@@ -204,15 +205,14 @@ class _ProfilePageState extends State<ProfilePage> {
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const HomePage(),
+                MaterialPageRoute(builder: (_) => const HomePage(id: 0)
                 ), //<<WalletPage
               );
               break;
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const ProfilePage()),
+                MaterialPageRoute(builder: (_) =>  ProfilePage(id: widget.id)),
               );
               break;
           }

@@ -3,9 +3,11 @@ import 'package:flutter_application_1/pages/Check_lottery.dart';
 import 'package:flutter_application_1/pages/Lotto_buy.dart';
 import 'package:flutter_application_1/pages/login.dart';
 import 'package:flutter_application_1/pages/profile.dart';
+import 'package:flutter_application_1/pages/wallet_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int id;
+  const HomePage({super.key, required this.id});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -13,6 +15,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,7 +186,7 @@ class _HomePageState extends State<HomePage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage()),
+                MaterialPageRoute(builder: (_) =>  HomePage(id: widget.id)),
               );
               break;
             case 1:
@@ -197,15 +204,14 @@ class _HomePageState extends State<HomePage> {
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const HomePage(),
+                MaterialPageRoute(builder: (_) => WalletPage(id: widget.id)
                 ), //<<WalletPage
               );
               break;
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const ProfilePage()),
+                MaterialPageRoute(builder: (_) => ProfilePage(id: widget.id)),
               );
               break;
           }
