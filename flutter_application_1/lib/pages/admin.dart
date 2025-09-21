@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/model/lotto_res.dart';
 
-import 'package:flutter_application_1/pages/drawresult.dart';
+import 'package:flutter_application_1/pages/draw_result.dart';
 import 'package:flutter_application_1/pages/login.dart';
 import 'package:http/http.dart' as http;
 
