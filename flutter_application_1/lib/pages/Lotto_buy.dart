@@ -6,6 +6,7 @@ import 'package:flutter_application_1/model/lotto_req.dart';
 import 'package:flutter_application_1/model/order_req.dart';
 import 'package:flutter_application_1/pages/Check_lottery.dart';
 import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/login.dart';
 import 'package:flutter_application_1/pages/profile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer';
@@ -49,7 +50,10 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const loginpages()),
+              );},
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
           Stack(
