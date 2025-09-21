@@ -73,8 +73,6 @@ router.post("/login", (req, res) => {
     }
 
     const user = users[0];
-    // !!! คำเตือน: ในระบบจริง ต้องเปรียบเทียบรหัสผ่านที่ hash แล้ว !!!
-    // !!! เช่น const isMatch = await bcrypt.compare(password, user.password_hash); !!!
     if (password !== user.password_hash) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
