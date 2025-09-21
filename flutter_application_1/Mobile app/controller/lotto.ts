@@ -5,6 +5,7 @@ import mysql from "mysql";
 
 export const router = express.Router();
 
+
 // สุ่มล็อตโต้ (100 ใบใหม่)
 router.post("/reset", (req, res) => {
   const lottoCount = 100;
@@ -36,13 +37,13 @@ router.post("/reset", (req, res) => {
 });
 
 // ดึงล็อตโต้ทั้งหมด
-router.get("/", (req, res) => {
-  const sql = "SELECT * FROM lottos";
-  conn.query(sql, (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(result);
-  });
-});
+// router.get("/", (req, res) => {
+//   const sql = "SELECT * FROM lottos";
+//   conn.query(sql, (err, result) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(result);
+//   });
+// });
 
 router.post("/draw", async (req, res) => {
   try {
@@ -79,6 +80,19 @@ router.post("/draw", async (req, res) => {
     }
   }
 });
+
+// GET: ดึงข้อมูลลอตเตอรี่ทั้งหมด
+router.get("/", (req, res) => {
+    const sql = "SELECT * FROM lottos";
+    conn.query(sql, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result);
+    });
+});
+
+// GET: ดึงข้อมูลลอตเตอรี่ตาม ID
 
 router.get("/:id", (req, res) => {
     const id = +req.params.id; // แปลง id จาก string เป็น number
