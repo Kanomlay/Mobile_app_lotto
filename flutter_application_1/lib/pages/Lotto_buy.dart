@@ -1,130 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/Check_lottery.dart';
+import 'package:flutter_application_1/pages/Lotto_buy.dart';
 import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/pages/profile.dart';
 
-class LottoBuyPage extends StatefulWidget {
-  const LottoBuyPage({super.key});
+class CheckPage extends StatefulWidget {
+  int id = 0;
+  CheckPage({super.key, required this.id});
 
   @override
-  State<LottoBuyPage> createState() => _LottoBuyPageState();
+  State<CheckPage> createState() => _CheckPageState();
 }
 
-class _LottoBuyPageState extends State<LottoBuyPage> {
-  int _currentIndex = 1;
+class _CheckPageState extends State<CheckPage> {
+  int _currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {
-    final List<String> lottoNumbers = ["324495", "355495", "326458", "329548"];
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
-        title: const Text("Lotto CS", style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {},
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text("Logout", style: TextStyle(color: Colors.white)),
+        title: const Text("ตรวจลอตเตอรี่"),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Center(child: Text("Logout")),
           ),
-          Stack(
+        ],
+      ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6)],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.shopping_cart, color: Colors.white),
+              const Text(
+                "กรอกหมายเลขลอตเตอรี่",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const Positioned(
-                right: 6,
-                top: 6,
-                child: CircleAvatar(
-                  radius: 8,
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    "1",
-                    style: TextStyle(fontSize: 10, color: Colors.black),
+              const SizedBox(height: 8),
+              const Text(
+                "ลอตเตอรี่ครึ่งงวดประจำวันที่",
+                style: TextStyle(color: Colors.red),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                items: const [
+                  DropdownMenuItem(
+                    value: "31/03/2564",
+                    child: Text("31 มีนาคม 2564"),
+                  ),
+                  DropdownMenuItem(
+                    value: "16/04/2564",
+                    child: Text("16 เมษายน 2564"),
+                  ),
+                ],
+                onChanged: (value) {},
+              ),
+              const SizedBox(height: 12),
+              const TextField(
+                decoration: InputDecoration(
+                  hintText: "กรอกหมายเลข",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
                   ),
                 ),
+                onPressed: () {},
+                child: const Text("ตรวจสลาก"),
               ),
             ],
           ),
-        ],
+        ),
       ),
-      body: Column(
-        children: [
-          // ช่องค้นหา
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "กรอกหมายเลขสลาก",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 0,
-                        horizontal: 12,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                  ),
-                  child: const Text("ค้นหา"),
-                ),
-              ],
-            ),
-          ),
 
-          // รายการสลาก
-          Expanded(
-            child: ListView.builder(
-              itemCount: lottoNumbers.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  child: ListTile(
-                    leading: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          "80",
-                          style: TextStyle(fontSize: 16, color: Colors.red),
-                        ),
-                        Text("บาท", style: TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                    title: Text(
-                      "สลากกินแบ่งรัฐบาล\n${lottoNumbers[index]}",
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    trailing: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey,
-                      ),
-                      child: const Text("ใส่ตะกร้า"),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
@@ -140,33 +102,33 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage()),
+                MaterialPageRoute(builder: (_) => HomePage(id: widget.id)),
               );
               break;
             case 1:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const LottoBuyPage()),
+                MaterialPageRoute(builder: (_) => LottoBuyPage(id: widget.id)),
               );
               break;
             case 2:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const CheckPage()),
+                MaterialPageRoute(builder: (_) => CheckPage(id: widget.id)),
               );
               break;
             case 3:
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const HomePage(),
+                  builder: (_) => HomePage(id: widget.id),
                 ), //<<WalletPage
               );
               break;
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const ProfilePage()),
+                MaterialPageRoute(builder: (_) => ProfilePage(id: widget.id)),
               );
               break;
           }

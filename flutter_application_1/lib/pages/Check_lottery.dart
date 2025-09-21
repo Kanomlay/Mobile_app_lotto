@@ -4,7 +4,8 @@ import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/pages/profile.dart';
 
 class CheckPage extends StatefulWidget {
-  const CheckPage({super.key});
+  int id = 0;
+  CheckPage({super.key, required this.id});
 
   @override
   State<CheckPage> createState() => _CheckPageState();
@@ -101,33 +102,33 @@ class _CheckPageState extends State<CheckPage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage()),
+                MaterialPageRoute(builder: (_) => HomePage(id: widget.id)),
               );
               break;
             case 1:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const LottoBuyPage()),
+                MaterialPageRoute(builder: (_) => LottoBuyPage(id: widget.id)),
               );
               break;
             case 2:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const CheckPage()),
+                MaterialPageRoute(builder: (_) => CheckPage(id: widget.id)),
               );
               break;
             case 3:
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const HomePage(),
+                  builder: (_) => HomePage(id: widget.id),
                 ), //<<WalletPage
               );
               break;
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const ProfilePage()),
+                MaterialPageRoute(builder: (_) => ProfilePage(id: widget.id)),
               );
               break;
           }

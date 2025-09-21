@@ -40,7 +40,7 @@ app.use("/",index);
 app.use("/lottos",lotto);
 app.use("/trip",trip);
 app.use('/users', user);
-app.use("/order", order);
+app.use("/orders", order);
 app.use("/upload", upload);
 app.use("/uploads", express.static("uploads"));
 

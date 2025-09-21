@@ -10,25 +10,25 @@ OrderReq orderReqFromJson(String str) => OrderReq.fromJson(json.decode(str));
 String orderReqToJson(OrderReq data) => json.encode(data.toJson());
 
 class OrderReq {
-  int orderId;
   int userId;
+  int lottoId;
   String purchaseDate;
 
   OrderReq({
-    required this.orderId,
     required this.userId,
+    required this.lottoId,
     required this.purchaseDate,
   });
 
   factory OrderReq.fromJson(Map<String, dynamic> json) => OrderReq(
-    orderId: json["order_id"],
     userId: json["user_id"],
+    lottoId: json["lotto_id"],
     purchaseDate: json["purchase_date"],
   );
 
   Map<String, dynamic> toJson() => {
-    "order_id": orderId,
     "user_id": userId,
+    "lotto_id": lottoId,
     "purchase_date": purchaseDate,
   };
 }
