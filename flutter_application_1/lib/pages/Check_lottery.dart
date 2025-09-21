@@ -127,7 +127,7 @@ class _CheckPageState extends State<CheckPage> {
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) =>  ProfilePage(id: 0)),
+                MaterialPageRoute(builder: (_) =>  ProfilePage(id: widget.id)),
               );
               break;
           }

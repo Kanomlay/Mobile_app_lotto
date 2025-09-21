@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/model/lotto_req.dart';
+import 'package:flutter_application_1/model/order_req.dart';
 import 'package:flutter_application_1/pages/Check_lottery.dart';
 import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/pages/profile.dart';
@@ -250,42 +251,36 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
     }
   }
 
-  Future<void> buyLotto(LottoRes lotto) async {
-    // ตรงนี้กำหนดวันซื้อเป็นวันนี้
-    final now = DateTime.now().toIso8601String().substring(0, 19);
+Future<void> buyLotto(LottoRes lotto) async {
+  final now = DateTime.now().toIso8601String().substring(0, 19);
 
-    final body = jsonEncode({
-      "user_id": widget.id,
-      "purchase_date": now,
-      // ถ้าจะส่ง lotto_id หรือ price ก็เพิ่มที่นี่ได้
-      // "lotto_id": lotto.id,
-    });
+  final body = jsonEncode({
+    "user_id": widget.id,
+    "purchase_date": now,
+    "lotto_id": lotto.lottoId, // ส่งเพิ่ม
+  });
 
-    try {
-      final res = await http.post(
-        Uri.parse('$url/orders'),
-        headers: {"Content-Type": "application/json"},
-        body: body,
-      );
-      log('Order response: ${res.body}');
-      if (res.statusCode == 201) {
-        // ซื้อสำเร็จ → แสดง snackbar
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('ซื้อสำเร็จ')));
-        // อัปเดตยอด wallet หรือ refresh หน้า
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ไม่สามารถซื้อได้ (${res.statusCode})')),
-        );
-      }
-    } catch (e) {
-      log('Error buying lotto: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('เกิดข้อผิดพลาด')));
+  try {
+    final res = await http.post(
+      Uri.parse('$url/orders/buy'),
+
+      headers: {"Content-Type": "application/json; charset=utf-8"},
+      body: body,
+    );
+    if (res.statusCode == 201) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('ซื้อสำเร็จ')));
+      getlottos(); // refresh
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('ไม่สามารถซื้อได้')));
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('เกิดข้อผิดพลาด')));
   }
+}
+
 
   // ฟังก์ชันค้นหาตามหมายเลขสลาก
   void _searchLottoByNumber(String query) {
