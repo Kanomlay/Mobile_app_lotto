@@ -1,7 +1,12 @@
 import 'dart:convert';
 import 'dart:developer'; // ใช้ log() ได้
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/model/order_id_res.dart';
 import 'package:flutter_application_1/model/user_id_res.dart';
+import 'package:flutter_application_1/pages/Check_lottery.dart';
+import 'package:flutter_application_1/pages/Lotto_buy.dart';
+import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/profile.dart';
 import 'wallet_info_page.dart';
 import 'package:flutter_application_1/config.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +22,8 @@ class WalletPage extends StatefulWidget {
 
 class _WalletPageState extends State<WalletPage> {
   late Future<void> _initializeData;
-  UserIdRes? user; // เก็บข้อมูลที่โหลดมา
+  UserIdRes? user;
+  OrderIdRes? order; // เก็บข้อมูลที่โหลดมา
   bool _isLoading = true;
 
   @override
@@ -66,8 +72,10 @@ class _WalletPageState extends State<WalletPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("เลขบัญชี",
-                              style: TextStyle(color: Colors.white)),
+                          const Text(
+                            "เลขบัญชี",
+                            style: TextStyle(color: Colors.white),
+                          ),
                           Text(
                             "*** * **123 4",
                             style: const TextStyle(color: Colors.white),
@@ -174,7 +182,38 @@ class _WalletPageState extends State<WalletPage> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.orange,
-        currentIndex: 3,
+        currentIndex: 3, // กระเป๋าสตางค์
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => HomePage(id: widget.id)),
+              );
+              break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => LottoBuyPage(id: widget.id)),
+              );
+              break;
+            case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => CheckPage(id: widget.id)),
+              );
+              break;
+            case 3:
+              // อยู่หน้านี้แล้ว ไม่ต้องทำอะไร
+              break;
+            case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => ProfilePage(id: widget.id)),
+              );
+              break;
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "หน้าหลัก"),
           BottomNavigationBarItem(
@@ -205,33 +244,33 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Future<void> _loadDataAsync() async {
-    try {
-      var config = await Configuration.getConfig();
-      var url = config['apiEndpoint'];
+Future<void> _loadDataAsync() async {
+  try {
+    var config = await Configuration.getConfig();
+    var url = config['apiEndpoint'];
 
-      log('Loading user info from: $url/users/${widget.id}'); // log url
-      var res = await http.get(Uri.parse('$url/users/${widget.id}'));
-      log('Status code: ${res.statusCode}');
-      log('Response body: ${res.body}');
-
-      if (res.statusCode == 200) {
-        var userRes = userIdResFromJson(res.body);
-        setState(() {
-          user = userRes;
-          _isLoading = false;
-        });
-        log('User loaded. Wallet balance: ${userRes.walletBalance}');
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      log('Error loading user: $e');
-      setState(() {
-        _isLoading = false;
-      });
+    // โหลด user
+    var res = await http.get(Uri.parse('$url/users/${widget.id}'));
+    if (res.statusCode == 200) {
+      var userRes = userIdResFromJson(res.body);
+      user = userRes;
     }
+
+    // โหลด orders ของ user
+    var resOrders = await http.get(Uri.parse('$url/orders/${widget.id}'));
+    if (resOrders.statusCode == 200) {
+      order = jsonDecode(resOrders.body);
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  } catch (e) {
+    log('Error loading user or orders: $e');
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
 }

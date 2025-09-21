@@ -10,7 +10,8 @@ import 'package:http/http.dart' as http;
 import 'dart:developer';
 
 class LottoBuyPage extends StatefulWidget {
-  const LottoBuyPage({super.key});
+  int id = 0;
+  LottoBuyPage({super.key, required this.id});
 
   @override
   State<LottoBuyPage> createState() => _LottoBuyPageState();
@@ -146,11 +147,13 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
                             style: const TextStyle(fontSize: 16),
                           ),
                           trailing: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              buyLotto(lotto);
+                            },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey,
+                              backgroundColor: Colors.orange,
                             ),
-                            child: const Text("ใส่ตะกร้า"),
+                            child: const Text("ซื้อ"),
                           ),
                         ),
                       );
@@ -173,31 +176,31 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage(id: 0)),
+                MaterialPageRoute(builder: (_) => HomePage(id: widget.id)),
               );
               break;
             case 1:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const LottoBuyPage()),
+                MaterialPageRoute(builder: (_) => LottoBuyPage(id: widget.id)),
               );
               break;
             case 2:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const CheckPage()),
+                MaterialPageRoute(builder: (_) => CheckPage(id: widget.id)),
               );
               break;
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage(id: 0)),
+                MaterialPageRoute(builder: (_) => HomePage(id: widget.id)),
               );
               break;
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) =>  ProfilePage(id: 0)),
+                MaterialPageRoute(builder: (_) => ProfilePage(id: widget.id)),
               );
               break;
           }
@@ -244,6 +247,43 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> buyLotto(LottoRes lotto) async {
+    // ตรงนี้กำหนดวันซื้อเป็นวันนี้
+    final now = DateTime.now().toIso8601String().substring(0, 19);
+
+    final body = jsonEncode({
+      "user_id": widget.id,
+      "purchase_date": now,
+      // ถ้าจะส่ง lotto_id หรือ price ก็เพิ่มที่นี่ได้
+      // "lotto_id": lotto.id,
+    });
+
+    try {
+      final res = await http.post(
+        Uri.parse('$url/orders'),
+        headers: {"Content-Type": "application/json"},
+        body: body,
+      );
+      log('Order response: ${res.body}');
+      if (res.statusCode == 201) {
+        // ซื้อสำเร็จ → แสดง snackbar
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('ซื้อสำเร็จ')));
+        // อัปเดตยอด wallet หรือ refresh หน้า
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ไม่สามารถซื้อได้ (${res.statusCode})')),
+        );
+      }
+    } catch (e) {
+      log('Error buying lotto: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('เกิดข้อผิดพลาด')));
     }
   }
 

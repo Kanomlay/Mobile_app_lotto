@@ -187,19 +187,19 @@ class _ProfilePageState extends State<ProfilePage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage(id: 0)),
+                MaterialPageRoute(builder: (_) =>  HomePage(id: widget.id)),
               );
               break;
             case 1:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const LottoBuyPage()),
+                MaterialPageRoute(builder: (_) => LottoBuyPage(id: widget.id)),
               );
               break;
             case 2:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const CheckPage()),
+                MaterialPageRoute(builder: (_) =>  CheckPage(id: widget.id)),
               );
               break;
             case 3:
