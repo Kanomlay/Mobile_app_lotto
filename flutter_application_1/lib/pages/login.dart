@@ -54,11 +54,6 @@ class _LoginpagesState extends State<loginpages> {
             icon: const Icon(Icons.home, color: Colors.black),
             onPressed: () {
               // Navigates to the root home page and clears the navigation stack
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (Route<dynamic> route) => false,
-              );
             },
           ),
         ],
@@ -182,46 +177,47 @@ class _LoginpagesState extends State<loginpages> {
     );
   }
 
-void login() {
-  LoginReq req = LoginReq(email: email.text, password: passwordHash.text);
+  void login() {
+    LoginReq req = LoginReq(email: email.text, password: passwordHash.text);
 
-  http
-      .post(
-        Uri.parse('$url/users/login'),
-        headers: {"Content-Type": "application/json; charset=utf-8"},
-        body: jsonEncode(req.toJson()),
-      )
-      .then((value) {
-        log('>>> email: ${req.email}');
-        log('>>> password: ${req.password}');
-        log(value.body);
+    http
+        .post(
+          Uri.parse('$url/users/login'),
+          headers: {"Content-Type": "application/json; charset=utf-8"},
+          body: jsonEncode(req.toJson()),
+        )
+        .then((value) {
+          log('>>> email: ${req.email}');
+          log('>>> password: ${req.password}');
+          log(value.body);
 
-        final data = jsonDecode(value.body);
-        if (data['error'] != null) {
-          log('Login error: ${data['error']}');
-          // แสดง Snackbar หรือ Alert ได้ตามต้องการ
-          return;
-        }
+          final data = jsonDecode(value.body);
+          if (data['error'] != null) {
+            log('Login error: ${data['error']}');
+            // แสดง Snackbar หรือ Alert ได้ตามต้องการ
+            return;
+          }
 
-        LoginRes loginRes = LoginRes.fromJson(data);
-        log(loginRes.message);
+          LoginRes loginRes = LoginRes.fromJson(data);
+          log(loginRes.message);
 
-        // ตรวจ role
-        if (loginRes.user.role.toLowerCase() == 'admin') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminPage()),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        }
-      })
-      .catchError((error) {
-        log(error.toString());
-      });
-}
-
+          // ตรวจ role
+          if (loginRes.user.role.toLowerCase() == 'admin') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminPage()),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(id: loginRes.user.userId),
+              ),
+            );
+          }
+        })
+        .catchError((error) {
+          log(error.toString());
+        });
+  }
 }

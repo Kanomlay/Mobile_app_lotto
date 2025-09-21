@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Lotto CS',
       theme: ThemeData(primarySwatch: Colors.orange),
-      home: const WalletPage(), // เริ่มที่หน้า Admin
+      home: const loginpages(), // เริ่มที่หน้า Admin
     );
   }
 }
