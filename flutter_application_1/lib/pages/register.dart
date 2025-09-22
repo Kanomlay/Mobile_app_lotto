@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/model/register_req.dart';
+import 'package:flutter_application_1/pages/login.dart';
 import 'package:http/http.dart' as http;
 
 class register extends StatefulWidget {
@@ -295,6 +296,10 @@ class _registerState extends State<register> {
         )
         .then((value) {
           log(value.body);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => loginpages(),)
+          );
         })
         .catchError((error) {});
   }

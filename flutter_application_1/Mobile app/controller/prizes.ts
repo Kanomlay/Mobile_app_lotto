@@ -250,6 +250,7 @@ router.post("/draw/sold", (req, res) => {
     }
   })();
 });
+
 // router.post("/draw", (req, res) => {
 //   (async () => {
 //     const prizeMoney = [2000000, 200000, 20000];

@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/model/lotto_req.dart';
 import 'package:flutter_application_1/model/order_req.dart';
+import 'package:flutter_application_1/model/user_id_res.dart';
 import 'package:flutter_application_1/pages/Check_lottery.dart';
 import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/pages/login.dart';
 import 'package:flutter_application_1/pages/profile.dart';
+import 'package:flutter_application_1/pages/wallet_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer';
 
@@ -23,6 +25,7 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
   int _currentIndex = 1;
   String url = '';
   bool _isLoading = true;
+  UserIdRes? user;
   List<LottoRes> _allLotto = [];
   List<LottoRes> _displayedLotto = [];
   TextEditingController _searchController = TextEditingController();
@@ -32,7 +35,11 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
     super.initState();
     Configuration.getConfig().then((config) {
       url = config['apiEndpoint'];
-      getlottos();
+      // โหลดข้อมูล user ก่อน
+      _loadDataAsync().then((_) {
+        // แล้วค่อยโหลดล็อตโต้
+        getlottos();
+      });
     });
   }
 
@@ -50,10 +57,12 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {Navigator.push(
+            onPressed: () {
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const loginpages()),
-              );},
+              );
+            },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
           Stack(
@@ -199,7 +208,7 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => HomePage(id: widget.id)),
+                MaterialPageRoute(builder: (_) => WalletPage(id: widget.id)),
               );
               break;
             case 4:
@@ -255,36 +264,91 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
     }
   }
 
-Future<void> buyLotto(LottoRes lotto) async {
-  final now = DateTime.now().toIso8601String().substring(0, 19);
-
-  final body = jsonEncode({
-    "user_id": widget.id,
-    "purchase_date": now,
-    "lotto_id": lotto.lottoId, // ส่งเพิ่ม
-  });
-
-  try {
-    final res = await http.post(
-      Uri.parse('$url/orders/buy'),
-
-      headers: {"Content-Type": "application/json; charset=utf-8"},
-      body: body,
-    );
-    if (res.statusCode == 201) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('ซื้อสำเร็จ')));
-      getlottos(); // refresh
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('ไม่สามารถซื้อได้')));
+  Future<void> _loadDataAsync() async {
+    try {
+      var res = await http.get(Uri.parse('$url/users/${widget.id}'));
+      if (res.statusCode == 200) {
+        user = userIdResFromJson(res.body);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      log('Error loading user: $e');
+      setState(() {
+        _isLoading = false;
+      });
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('เกิดข้อผิดพลาด')));
   }
-}
 
+  Future<void> buyLotto(LottoRes lotto) async {
+    const lottoPrice = 80;
+
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('ไม่พบข้อมูลผู้ใช้')));
+      return;
+    }
+
+    // ตรวจสอบเงิน
+    final currentBalance = double.tryParse(user!.walletBalance.toString()) ?? 0;
+    if (currentBalance < lottoPrice) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'ยอดเงินในกระเป๋าไม่เพียงพอ (${user!.walletBalance} บาท)',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final now = DateTime.now().toIso8601String().substring(0, 19);
+    final body = jsonEncode({
+      "user_id": widget.id,
+      "purchase_date": now,
+      "lotto_id": lotto.lottoId,
+    });
+
+    try {
+      final res = await http.post(
+        Uri.parse('$url/orders/buy'),
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: body,
+      );
+
+      if (res.statusCode == 201) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('ซื้อสำเร็จ')));
+        // อัปเดตยอดเงินในแอปเลย (หัก 80)
+        // The UserIdRes model does not have a copyWith method.
+        // We need to create a new UserIdRes object with the updated walletBalance.
+        setState(() {
+          user = UserIdRes(
+            userId: user!.userId,
+            firstName: user!.firstName,
+            lastName: user!.lastName,
+            email: user!.email,
+            role: user!.role,
+            walletBalance: (currentBalance - lottoPrice).toString(),
+            createdAt: user!.createdAt,
+          );
+        });
+        getlottos();
+      } else {
+        final errMsg = jsonDecode(res.body)['error'] ?? 'ไม่สามารถซื้อได้';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errMsg)));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('เกิดข้อผิดพลาด')));
+    }
+  }
 
   // ฟังก์ชันค้นหาตามหมายเลขสลาก
   void _searchLottoByNumber(String query) {
