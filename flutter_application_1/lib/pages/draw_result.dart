@@ -1,8 +1,61 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/login.dart';
 import 'admin.dart';
 
-class DrawResultPage extends StatelessWidget {
+class DrawResultPage extends StatefulWidget {
   const DrawResultPage({super.key});
+
+  @override
+  State<DrawResultPage> createState() => _DrawResultPageState();
+}
+
+class _DrawResultPageState extends State<DrawResultPage> {
+  final Random random = Random();
+  List<Map<String, dynamic>> results = [];
+
+  // เงินรางวัลแต่ละลำดับ
+  final prizeMoney = [2000000, 200000, 20000, 2000, 200];
+
+  void drawLotto() {
+    Set<int> numbers = {};
+    while (numbers.length < 5) {
+      numbers.add(random.nextInt(1000000)); // สุ่มเลข 6 หลัก
+    }
+
+    final nums = numbers.toList();
+
+    setState(() {
+      results = List.generate(nums.length, (index) {
+        return {
+          "prize": "รางวัลที่ ${index + 1}",
+          "number": nums[index].toString().padLeft(6, "0"),
+          "money": prizeMoney[index],
+        };
+      });
+
+      // เพิ่มรางวัลเลขท้าย 3 ตัว และ 2 ตัว
+      if (results.isNotEmpty) {
+        final firstPrize = results[0]["number"];
+        results.add({
+          "prize": "รางวัลเลขท้าย 3 ตัว",
+          "number": firstPrize.substring(3),
+          "money": 4000,
+        });
+        results.add({
+          "prize": "รางวัลเลขท้าย 2 ตัว",
+          "number": firstPrize.substring(4),
+          "money": 2000,
+        });
+      }
+    });
+  }
+
+  void resetDraw() {
+    setState(() {
+      results.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,10 +64,6 @@ class DrawResultPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFF8C42),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {},
-        ),
         title: const Text(
           "Lotto CS",
           style: TextStyle(
@@ -26,7 +75,12 @@ class DrawResultPage extends StatelessWidget {
         centerTitle: true,
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const loginpages()),
+              );
+            },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -67,7 +121,6 @@ class DrawResultPage extends StatelessWidget {
                   ],
                 ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -80,7 +133,7 @@ class DrawResultPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: drawLotto,
                       child: const Text(
                         "สุ่มรางวัล",
                         style: TextStyle(color: Colors.white, fontSize: 16),
@@ -98,15 +151,15 @@ class DrawResultPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Text("รางวัลที่ 1: 123456   เงินรางวัล: 2,000,000"),
-                    const Text("รางวัลที่ 2: 456789   เงินรางวัล: 200,000"),
-                    const Text("รางวัลที่ 3: 987654   เงินรางวัล: 20,000"),
-                    const Text("รางวัลที่ 4: 112233   เงินรางวัล: 2,000"),
-                    const Text("รางวัลที่ 5: 445566   เงินรางวัล: 200"),
+                    if (results.isEmpty) const Text("ยังไม่มีการออกรางวัล"),
+                    for (var r in results)
+                      Text(
+                        "${r['prize']}: ${r['number']}   เงินรางวัล: ${r['money']}",
+                      ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
+                        backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 28,
                           vertical: 14,
@@ -115,7 +168,31 @@ class DrawResultPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: resetDraw,
+                      child: const Text(
+                        "รีเซ็ต",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("บันทึกผลการออกรางวัลแล้ว"),
+                          ),
+                        );
+                      },
                       child: const Text(
                         "บันทึกออกรางวัล",
                         style: TextStyle(color: Colors.white, fontSize: 16),
@@ -127,52 +204,6 @@ class DrawResultPage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            GestureDetector(
-              onTap: () {
-                // กลับไปหน้า Admin
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AdminPage()),
-                  (route) => false,
-                );
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.menu, color: Colors.black),
-                  Text(
-                    "หน้าหลัก",
-                    style: TextStyle(color: Colors.black, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text("ไปหน้าโปรไฟล์")));
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.person, color: Colors.black),
-                  Text(
-                    "โปรไฟล์",
-                    style: TextStyle(color: Colors.black, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
