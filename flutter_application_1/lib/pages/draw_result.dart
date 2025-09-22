@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/login.dart';
+import 'package:flutter_application_1/config.dart';
+import 'package:flutter_application_1/model/prize_req.dart';
+import 'package:http/http.dart' as http;
 import 'admin.dart';
 
 class DrawResultPage extends StatefulWidget {
@@ -13,49 +17,81 @@ class DrawResultPage extends StatefulWidget {
 class _DrawResultPageState extends State<DrawResultPage> {
   final Random random = Random();
   List<Map<String, dynamic>> results = [];
+  String url = '';
 
   // เงินรางวัลแต่ละลำดับ
-  final prizeMoney = [2000000, 200000, 20000, 2000, 200];
+  final prizeMoney = [2000000, 200000, 20000]; // รางวัลที่ 1,2,3
 
-  void drawLotto() {
-    Set<int> numbers = {};
-    while (numbers.length < 5) {
-      numbers.add(random.nextInt(1000000)); // สุ่มเลข 6 หลัก
+  @override
+  void initState() {
+    super.initState();
+    Configuration.getConfig().then((config) {
+      setState(() {
+        url = config['apiEndpoint'];
+      });
+    });
+  }
+
+  Future<void> drawAndFetchPrizes() async {
+    final res = await http.post(Uri.parse('$url/prizes/draw'));
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+
+      // อัพเดต UI
+      setState(() {
+        results = (data['prizes'] as List).map((p) {
+          return {
+            "prize": p['prize_name'],
+            "number": p['winning_number'],
+            "money": p['prize_amount'],
+          };
+        }).toList();
+      });
+    } else {
+      debugPrint('ออกรางวัลไม่สำเร็จ: ${res.body}');
+    }
+  }
+
+  Future<void> drawsold() async {
+  final res = await http.post(Uri.parse('$url/prizes/draw/sold'));
+  if (res.statusCode == 200) {
+    final data = jsonDecode(res.body);
+
+    setState(() {
+      results = (data['prizes'] as List).map((p) {
+        return {
+          "prize": p['prize_name'],
+          "number": p['winning_number'],
+          "money": p['prize_amount'],
+        };
+      }).toList();
+    });
+  } else {
+    // อ่าน error message จาก API
+    final err = jsonDecode(res.body);
+    final errorMsg = err['error'] ?? 'เกิดข้อผิดพลาด';
+
+    // แจ้งเตือนผู้ใช้
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('แจ้งเตือน'),
+          content: Text(errorMsg),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('ตกลง'),
+            ),
+          ],
+        ),
+      );
     }
 
-    final nums = numbers.toList();
-
-    setState(() {
-      results = List.generate(nums.length, (index) {
-        return {
-          "prize": "รางวัลที่ ${index + 1}",
-          "number": nums[index].toString().padLeft(6, "0"),
-          "money": prizeMoney[index],
-        };
-      });
-
-      // เพิ่มรางวัลเลขท้าย 3 ตัว และ 2 ตัว
-      if (results.isNotEmpty) {
-        final firstPrize = results[0]["number"];
-        results.add({
-          "prize": "รางวัลเลขท้าย 3 ตัว",
-          "number": firstPrize.substring(3),
-          "money": 4000,
-        });
-        results.add({
-          "prize": "รางวัลเลขท้าย 2 ตัว",
-          "number": firstPrize.substring(4),
-          "money": 2000,
-        });
-      }
-    });
+    debugPrint('ออกรางวัลไม่สำเร็จ: ${res.body}');
   }
+}
 
-  void resetDraw() {
-    setState(() {
-      results.clear();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +169,7 @@ class _DrawResultPageState extends State<DrawResultPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: drawLotto,
+                      onPressed: drawAndFetchPrizes,
                       child: const Text(
                         "สุ่มรางวัล",
                         style: TextStyle(color: Colors.white, fontSize: 16),
@@ -157,9 +193,11 @@ class _DrawResultPageState extends State<DrawResultPage> {
                         "${r['prize']}: ${r['number']}   เงินรางวัล: ${r['money']}",
                       ),
                     const SizedBox(height: 20),
+
+                    // 🔹 ปุ่มใหม่ สุ่มจากที่ขาย
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.orange,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 28,
                           vertical: 14,
@@ -168,33 +206,9 @@ class _DrawResultPageState extends State<DrawResultPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: resetDraw,
+                      onPressed: drawsold,
                       child: const Text(
-                        "รีเซ็ต",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 28,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("บันทึกผลการออกรางวัลแล้ว"),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "บันทึกออกรางวัล",
+                        "สุ่มจากที่ขาย",
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),

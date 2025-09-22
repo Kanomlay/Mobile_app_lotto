@@ -4,6 +4,7 @@ import {router as lotto} from "./controller/lotto";
 import {router as trip} from "./controller/trip";
 import {router as user} from "./controller/users";
 import {router as order} from "./controller/order";
+import {router as prizes} from "./controller/prizes";
 import bodyParser from "body-parser";
 import {router as upload} from "./controller/upload";
 import cors from "cors";
@@ -41,6 +42,7 @@ app.use("/lottos",lotto);
 app.use("/trip",trip);
 app.use('/users', user);
 app.use("/orders", order);
+app.use("/prizes", prizes);
 app.use("/upload", upload);
 app.use("/uploads", express.static("uploads"));
 

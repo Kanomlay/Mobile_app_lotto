@@ -127,35 +127,100 @@ router.delete("/", (req, res) => {
     });
 });
 
-// สุ่มล็อตโต้ (100 ใบใหม่)
 router.post("/reset", (req, res) => {
   const lottoCount = 100;
   const values: any[] = [];
-  for (let i = 0; i < lottoCount; i++) {
+  const usedNumbers = new Set<string>();
+
+  while (usedNumbers.size < lottoCount) {
     const num = Math.floor(Math.random() * 1000000);
-    const formatted = num.toString().padStart(6, '0');
-    values.push([formatted, 80, 1, "AVAILABLE", new Date()]);
+    const formatted = num.toString().padStart(6, "0");
+    usedNumbers.add(formatted);
   }
 
-  // ลบข้อมูลทั้งหมด
-  const deleteSql = "DELETE FROM lottos";
-  conn.query(deleteSql, (err) => {
+  // เตรียม values สำหรับ insert
+  for (const num of usedNumbers) {
+    values.push([num, 80, 1, "AVAILABLE", new Date()]);
+  }
+
+  // 1️⃣ ลบ lottos
+  conn.query("DELETE FROM lottos", (err) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    // รีเซ็ต AUTO_INCREMENT
-    const resetAI = "ALTER TABLE lottos AUTO_INCREMENT = 1";
-    conn.query(resetAI, (err) => {
+    conn.query("ALTER TABLE lottos AUTO_INCREMENT = 1", (err) => {
       if (err) return res.status(500).json({ error: err.message });
 
-      // สร้างล็อตโต้ใหม่
-      const insertSql = "INSERT INTO lottos(lotto_number, lotto_price, created_by_user_id, status, created_at) VALUES ?";
-      conn.query(insertSql, [values], (err, result) => {
+      // 2️⃣ ลบ orders
+      conn.query("DELETE FROM orders", (err) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: `ระบบถูกรีเซ็ตและสร้างล็อตโต้ใหม่ ${lottoCount} ใบ` });
+
+        conn.query("ALTER TABLE orders AUTO_INCREMENT = 1", (err) => {
+          if (err) return res.status(500).json({ error: err.message });
+
+          // 3️⃣ ลบ prizes
+          conn.query("DELETE FROM prizes", (err) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            conn.query("ALTER TABLE prizes AUTO_INCREMENT = 1", (err) => {
+              if (err) return res.status(500).json({ error: err.message });
+
+              // 4️⃣ ลบ users เหลือ admin
+              conn.query("DELETE FROM users WHERE role != 'ADMIN'", (err) => {
+                if (err) return res.status(500).json({ error: err.message });
+
+                conn.query("ALTER TABLE users AUTO_INCREMENT = 2", (err) => {
+                  if (err) return res.status(500).json({ error: err.message });
+
+                  // 5️⃣ สร้างลอตเตอรี่ใหม่
+                  const insertSql =
+                    "INSERT INTO lottos(lotto_number, lotto_price, created_by_user_id, status, created_at) VALUES ?";
+                  conn.query(insertSql, [values], (err, result) => {
+                    if (err) return res.status(500).json({ error: err.message });
+
+                    res.json({
+                      message: `รีเซ็ตระบบสำเร็จและสร้างลอตเตอรี่ใหม่ ${lottoCount} ใบ`,
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
       });
     });
   });
 });
+
+
+// สุ่มล็อตโต้ (100 ใบใหม่)
+// router.post("/reset", (req, res) => {
+//   const lottoCount = 100;
+//   const values: any[] = [];
+//   for (let i = 0; i < lottoCount; i++) {
+//     const num = Math.floor(Math.random() * 1000000);
+//     const formatted = num.toString().padStart(6, '0');
+//     values.push([formatted, 80, 1, "AVAILABLE", new Date()]);
+//   }
+
+//   // ลบข้อมูลทั้งหมด
+//   const deleteSql = "DELETE FROM lottos";
+//   conn.query(deleteSql, (err) => {
+//     if (err) return res.status(500).json({ error: err.message });
+
+//     // รีเซ็ต AUTO_INCREMENT
+//     const resetAI = "ALTER TABLE lottos AUTO_INCREMENT = 1";
+//     conn.query(resetAI, (err) => {
+//       if (err) return res.status(500).json({ error: err.message });
+
+//       // สร้างล็อตโต้ใหม่
+//       const insertSql = "INSERT INTO lottos(lotto_number, lotto_price, created_by_user_id, status, created_at) VALUES ?";
+//       conn.query(insertSql, [values], (err, result) => {
+//         if (err) return res.status(500).json({ error: err.message });
+//         res.json({ message: `ระบบถูกรีเซ็ตและสร้างล็อตโต้ใหม่ ${lottoCount} ใบ` });
+//       });
+//     });
+//   });
+// });
 
 // ดึงล็อตโต้ทั้งหมด
 // router.get("/", (req, res) => {
