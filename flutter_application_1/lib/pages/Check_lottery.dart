@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/model/lotto_prize_res.dart';
+import 'package:flutter_application_1/pages/login.dart';
 import 'package:flutter_application_1/pages/wallet_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/pages/Lotto_buy.dart';
@@ -11,7 +12,7 @@ import 'package:flutter_application_1/pages/profile.dart';
 class CheckPage extends StatefulWidget {
   final int id;
   const CheckPage({super.key, required this.id});
-
+  
   @override
   State<CheckPage> createState() => _CheckPageState();
 }
@@ -71,10 +72,16 @@ class _CheckPageState extends State<CheckPage> {
       appBar: AppBar(
         backgroundColor: Colors.orange,
         title: const Text("ตรวจลอตเตอรี่"),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Center(child: Text("Logout")),
+        actions:  [
+           TextButton(
+            onPressed: () {
+              int id = 0;
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const loginpages()),
+                    );
+            },
+            child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

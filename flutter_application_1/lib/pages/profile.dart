@@ -5,6 +5,7 @@ import 'package:flutter_application_1/model/user_id_res.dart'; // ✅ ใช้ 
 import 'package:flutter_application_1/pages/Check_lottery.dart';
 import 'package:flutter_application_1/pages/Lotto_buy.dart';
 import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/login.dart';
 import 'package:flutter_application_1/pages/wallet_page.dart';
 import 'package:http/http.dart' as http;
 
@@ -69,9 +70,15 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           TextButton(
             onPressed: () {
-              // logout
+              setState(() {
+                widget.id = 0; 
+              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const loginpages()),
+              );
             },
-            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+            child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

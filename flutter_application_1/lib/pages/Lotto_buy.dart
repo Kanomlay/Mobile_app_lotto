@@ -58,6 +58,9 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
         actions: [
           TextButton(
             onPressed: () {
+              setState(() {
+                widget.id = 0; 
+              });
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const loginpages()),

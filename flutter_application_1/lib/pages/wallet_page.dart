@@ -6,6 +6,7 @@ import 'package:flutter_application_1/model/user_id_res.dart';
 import 'package:flutter_application_1/pages/Check_lottery.dart';
 import 'package:flutter_application_1/pages/Lotto_buy.dart';
 import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/login.dart';
 import 'package:flutter_application_1/pages/profile.dart';
 import 'wallet_info_page.dart';
 import 'package:flutter_application_1/config.dart';
@@ -40,8 +41,19 @@ class _WalletPageState extends State<WalletPage> {
       appBar: AppBar(
         backgroundColor: Colors.orange,
         title: const Text("Lotto CS"),
-        actions: const [
-          Padding(padding: EdgeInsets.all(8.0), child: Text("Logout")),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                widget.id = 0; 
+              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const loginpages()),
+              );
+            },
+            child: const Text("Logout", style: TextStyle(color: Colors.white)),
+          ),
         ],
       ),
       body: FutureBuilder(

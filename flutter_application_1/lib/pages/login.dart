@@ -37,25 +37,12 @@ class _LoginpagesState extends State<loginpages> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Allows the back button to function correctly
-            Navigator.pop(context);
-          },
-        ),
         title: const Text(
           "SIGN IN",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.black),
-            onPressed: () {
-              // Navigates to the root home page and clears the navigation stack
-            },
-          ),
         ],
       ),
       body: SingleChildScrollView(
