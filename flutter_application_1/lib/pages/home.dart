@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,9 +35,10 @@ class _HomePageState extends State<HomePage> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const loginpages()),
+                (route) => false, // ❌ เคลียร์ทุก route เก่าออก
               );
             },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
@@ -47,7 +49,6 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             // แถบรอบออกรางวัล
             Container(
               width: double.infinity,
@@ -179,25 +180,26 @@ class _HomePageState extends State<HomePage> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) =>  HomePage(id: widget.id)),
+                MaterialPageRoute(builder: (_) => HomePage(id: widget.id)),
               );
               break;
             case 1:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) =>  LottoBuyPage(id: widget.id)),
+                MaterialPageRoute(builder: (_) => LottoBuyPage(id: widget.id)),
               );
               break;
             case 2:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) =>  CheckPage(id: widget.id)),
+                MaterialPageRoute(builder: (_) => CheckPage(id: widget.id)),
               );
               break;
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => WalletPage(id: widget.id)
+                MaterialPageRoute(
+                  builder: (_) => WalletPage(id: widget.id),
                 ), //<<WalletPage
               );
               break;

@@ -48,6 +48,7 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
     // ไม่ต้องใช้ lottoNumbers แบบเดิมแล้ว
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.orange,
         title: const Text("Lotto CS", style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -59,11 +60,12 @@ class _LottoBuyPageState extends State<LottoBuyPage> {
           TextButton(
             onPressed: () {
               setState(() {
-                widget.id = 0; 
+                widget.id = 0;
               });
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const loginpages()),
+                (route) => false, // ❌ เคลียร์ทุก route เก่าออก
               );
             },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),

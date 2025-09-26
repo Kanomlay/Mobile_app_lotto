@@ -45,11 +45,12 @@ class _WalletPageState extends State<WalletPage> {
           TextButton(
             onPressed: () {
               setState(() {
-                widget.id = 0; 
+                widget.id = 0;
               });
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const loginpages()),
+                (route) => false, // ❌ เคลียร์ทุก route เก่าออก
               );
             },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
@@ -256,33 +257,32 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-Future<void> _loadDataAsync() async {
-  try {
-    var config = await Configuration.getConfig();
-    var url = config['apiEndpoint'];
+  Future<void> _loadDataAsync() async {
+    try {
+      var config = await Configuration.getConfig();
+      var url = config['apiEndpoint'];
 
-    // โหลด user
-    var res = await http.get(Uri.parse('$url/users/${widget.id}'));
-    if (res.statusCode == 200) {
-      var userRes = userIdResFromJson(res.body);
-      user = userRes;
+      // โหลด user
+      var res = await http.get(Uri.parse('$url/users/${widget.id}'));
+      if (res.statusCode == 200) {
+        var userRes = userIdResFromJson(res.body);
+        user = userRes;
+      }
+
+      // โหลด orders ของ user
+      var resOrders = await http.get(Uri.parse('$url/orders/${widget.id}'));
+      if (resOrders.statusCode == 200) {
+        order = jsonDecode(resOrders.body);
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      log('Error loading user or orders: $e');
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    // โหลด orders ของ user
-    var resOrders = await http.get(Uri.parse('$url/orders/${widget.id}'));
-    if (resOrders.statusCode == 200) {
-      order = jsonDecode(resOrders.body);
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  } catch (e) {
-    log('Error loading user or orders: $e');
-    setState(() {
-      _isLoading = false;
-    });
   }
-}
-
 }

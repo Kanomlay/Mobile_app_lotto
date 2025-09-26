@@ -12,7 +12,7 @@ import 'package:flutter_application_1/pages/profile.dart';
 class CheckPage extends StatefulWidget {
   final int id;
   const CheckPage({super.key, required this.id});
-  
+
   @override
   State<CheckPage> createState() => _CheckPageState();
 }
@@ -72,14 +72,15 @@ class _CheckPageState extends State<CheckPage> {
       appBar: AppBar(
         backgroundColor: Colors.orange,
         title: const Text("ตรวจลอตเตอรี่"),
-        actions:  [
-           TextButton(
+        actions: [
+          TextButton(
             onPressed: () {
               int id = 0;
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const loginpages()),
-                    );
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const loginpages()),
+                (route) => false, // ❌ เคลียร์ทุก route เก่าออก
+              );
             },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
           ),
@@ -225,37 +226,36 @@ class _CheckPageState extends State<CheckPage> {
       ),
     );
   }
-  Future<void> _redeemLotto(int lottoId) async {
-  if (url.isEmpty) return;
-  try {
-    final response = await http.post(
-      Uri.parse('$url/users/redeem-lotto/$lottoId'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': widget.id}), // ส่ง userId ไป
-    );
 
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      // โชว์ snackbar บอกว่าได้เงินเท่าไหร่
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ขึ้นเงินสำเร็จ +${body['prizeAmount']} บาท')),
+  Future<void> _redeemLotto(int lottoId) async {
+    if (url.isEmpty) return;
+    try {
+      final response = await http.post(
+        Uri.parse('$url/users/redeem-lotto/$lottoId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userId': widget.id}), // ส่ง userId ไป
       );
-      // reload list อีกครั้งหลังขึ้นเงิน
-      _loadWinningLottos();
-    } else {
-      // กรณี error
-      final body = jsonDecode(response.body);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(body['message'] ?? 'ขึ้นเงินไม่สำเร็จ')),
-      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        // โชว์ snackbar บอกว่าได้เงินเท่าไหร่
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ขึ้นเงินสำเร็จ +${body['prizeAmount']} บาท')),
+        );
+        // reload list อีกครั้งหลังขึ้นเงิน
+        _loadWinningLottos();
+      } else {
+        // กรณี error
+        final body = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(body['message'] ?? 'ขึ้นเงินไม่สำเร็จ')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error redeem: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('เกิดข้อผิดพลาดในการขึ้นเงิน')));
     }
-  } catch (e) {
-    debugPrint('Error redeem: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('เกิดข้อผิดพลาดในการขึ้นเงิน')),
-    );
   }
 }
-
-}
-

@@ -63,19 +63,17 @@ class _ProfilePageState extends State<ProfilePage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {},
-        ),
+        leading: IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
         actions: [
           TextButton(
             onPressed: () {
               setState(() {
-                widget.id = 0; 
+                widget.id = 0;
               });
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const loginpages()),
+                (route) => false, // ❌ เคลียร์ทุก route เก่าออก
               );
             },
             child: const Text("Logout", style: TextStyle(color: Colors.white)),
@@ -115,7 +113,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         Text(
                           '${user!.firstName} ${user!.lastName}',
                           style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Column(
@@ -187,10 +187,18 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "หน้าแรก"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "คำสั่งซื้อ"),
-          BottomNavigationBarItem(icon: Icon(Icons.check_circle), label: "ตรวจสอบ"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet), label: "กระเป๋าสตางค์ และสลาก"),
+            icon: Icon(Icons.shopping_cart),
+            label: "คำสั่งซื้อ",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle),
+            label: "ตรวจสอบ",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet),
+            label: "กระเป๋าสตางค์ และสลาก",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "โปรไฟล์"),
         ],
       ),
