@@ -47,13 +47,6 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // รูปด้านบน
-            Image.network(
-              "https://www.lottery.co.th/sites/default/files/styles/lottery_ticket/public/lotto.jpg", // ตัวอย่าง URL
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
 
             // แถบรอบออกรางวัล
             Container(

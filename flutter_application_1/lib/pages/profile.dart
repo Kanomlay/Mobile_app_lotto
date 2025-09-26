@@ -5,11 +5,12 @@ import 'package:flutter_application_1/model/user_id_res.dart'; // ✅ ใช้ 
 import 'package:flutter_application_1/pages/Check_lottery.dart';
 import 'package:flutter_application_1/pages/Lotto_buy.dart';
 import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/wallet_page.dart';
 import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
-  final int id; // ✅ ใช้ final ดีกว่า
-  const ProfilePage({super.key, required this.id});
+  int id = 0; // ✅ ใช้ final ดีกว่า
+  ProfilePage({super.key, required this.id});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -166,7 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomePage(id: 0)),
+                MaterialPageRoute(builder: (_) => WalletPage(id: widget.id)),
               );
               break;
             case 4:
