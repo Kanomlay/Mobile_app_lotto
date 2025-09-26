@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/trip';
+const API_BASE_URL = 'https://render-lotto-deployment-3.onrender.com';
 const responseDiv = document.getElementById('response');
 
 // Helper function to display response

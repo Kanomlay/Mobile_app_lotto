@@ -17,6 +17,7 @@ const allowedOrigins = [
   "http://localhost:3000", // Another local dev frontend (e.g., Create React App default)
   "https://your-production-frontend.com", // Your production frontend domain
   "https://another-approved-domain.org", // Another approved domain
+  "https://render-lotto-deployment-3.onrender.com",
   // Add more origins as needed
 ];
 
