@@ -1,15 +1,41 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:developer';
 
-class register extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/config.dart';
+import 'package:flutter_application_1/model/register_req.dart';
+import 'package:flutter_application_1/pages/login.dart';
+import 'package:http/http.dart' as http;
+
+class register extends StatefulWidget {
   const register({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final firstNameController = TextEditingController();
+  State<register> createState() => _registerState();
+}
+
+class _registerState extends State<register> {
+  String url = '';
+    final firstNameController =
+        TextEditingController(); // ... (rest of the code)
     final lastNameController = TextEditingController();
     final phoneController = TextEditingController();
     final emailController = TextEditingController();
+    final passController = TextEditingController();
+    final conpassController = TextEditingController();
+    final moneyController = TextEditingController();
     bool agreeTerms = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Configuration.getConfig().then((config) {
+      url = config['apiEndpoint'];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +54,7 @@ class register extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.home, color: Colors.black),
             onPressed: () {},
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -48,7 +74,7 @@ class register extends StatelessWidget {
                     blurRadius: 3,
                     color: Colors.black26,
                     offset: Offset(2, 2),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -135,6 +161,35 @@ class register extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
 
+                  // Email
+                  TextField(
+                    controller: moneyController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "Money",
+                      hintText: "กลอกเงินเริ่มต้น",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    controller: passController,
+                    decoration: const InputDecoration(
+                      labelText: "Password",
+                      hintText: "กรอกรหัสผ่าน",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    controller: conpassController,
+                    decoration: const InputDecoration(
+                      labelText: "ConfirmPassword",
+                      hintText: "กรอกรหัสผ่านยืนยัน",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
                   // Checkbox ยอมรับเงื่อนไข
                   Row(
                     children: [
@@ -155,7 +210,7 @@ class register extends StatelessWidget {
                           "ฉันยอมรับข้อกำหนดและเงื่อนไข",
                           style: TextStyle(fontSize: 14),
                         ),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -169,7 +224,7 @@ class register extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       onPressed: () {
-                        // TODO: signup logic
+                        Register();
                       },
                       child: const Text(
                         "SIGN UP",
@@ -203,10 +258,49 @@ class register extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
     );
+  }
+
+  void Register() {
+    // var sample = {
+    //   "first_name": "a",
+    //   "last_name": "User",
+    //   "phone_number": "0812345678",
+    //   "email": "a@a",
+    //   "password_hash": "123456",
+    //   "wallet_balance": 1000,
+    // };
+    RegisterReq req = RegisterReq(
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      phoneNumber: phoneController.text,
+      email: emailController.text,
+      passwordHash: passController.text,
+      walletBalance: int.parse(moneyController.text),
+    );    
+    if (passController.text != conpassController.text) {
+      log('Passwords do not match');
+      return;
+    }
+
+
+    http
+        .post(
+          Uri.parse('$url/users/register'),
+          headers: {"Content-Type": "application/json; charset=utf-8"},
+          body: jsonEncode(req),
+        )
+        .then((value) {
+          log(value.body);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => loginpages(),)
+          );
+        })
+        .catchError((error) {});
   }
 }
